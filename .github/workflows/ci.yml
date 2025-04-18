@@ -20,30 +20,31 @@ jobs:
 
       - name: Install Neovim ${{ matrix.neovim }}
         run: |
+          set -euo pipefail
+
           VERSION=${{ matrix.neovim }}
 
-          if [[ "$VERSION" == "v0.10.0" ]]; then
+          # All historic 0.x tags use nvim-linux64.tar.gz, everything newer uses -x86_64
+          if [[ "$VERSION" =~ ^v0\.[0-9]+\. ]]; then
             FILENAME=nvim-linux64.tar.gz
           else
             FILENAME=nvim-linux-x86_64.tar.gz
           fi
 
-          URL=https://github.com/neovim/neovim/releases/download/${VERSION}/${FILENAME}
-          echo "Downloading from $URL"
-          
-          # Download and extract
-          curl -fl "$URL" -o nvim.tar.gz
+          URL="https://github.com/neovim/neovim/releases/download/${VERSION}/${FILENAME}"
+          echo "Downloading $URL"
 
-          # Extract archive into temp directory
-          mkdir -p nvim-extract
+          curl -fL -o nvim.tar.gz "$URL"        # -f = fail on 4xx/5xx, -L = follow redirects
+
+          mkdir nvim-extract
           tar -xzf nvim.tar.gz -C nvim-extract
 
-          # Detect folder name
-          DIR=$(ls nvim-extract | head -1)
-
-          # Move to opt
+          DIR="$(ls nvim-extract | head -n1)"   # should be nvim-linux64 or nvim-linux-x86_64
           sudo mv "nvim-extract/$DIR" /opt/nvim
-          echo "/opt/nvim/bin" >> $GITHUB_PATH
+          echo "/opt/nvim/bin" >> "$GITHUB_PATH"
+
+      - name: Verify Neovim
+        run: nvim --version
 
       - name: Install Plenary
         run: |
