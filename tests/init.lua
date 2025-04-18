@@ -1,4 +1,6 @@
 -- tests/init.lua
+-- luacheck: globals describe it before_each
+-- luacheck: ignore async
 local async = require("plenary.async.tests")
 
 describe("codex.nvim", function()

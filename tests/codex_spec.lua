@@ -1,3 +1,6 @@
+-- tests/codex_spec.lua
+-- luacheck: globals describe it assert eq
+-- luacheck: ignore a            -- “a” is imported but unused
 local a = require("plenary.async.tests")
 local eq = assert.equals
 
