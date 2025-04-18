@@ -22,7 +22,7 @@ jobs:
         run: |
           VERSION=${{ matrix.neovim }}
 
-          if [[ "$VERSION" == "v0."* ]]; then
+          if [[ "$VERSION" == "v0.10.0" ]]; then
             FILENAME=nvim-linux64.tar.gz
           else
             FILENAME=nvim-linux-x86_64.tar.gz
@@ -30,6 +30,9 @@ jobs:
 
           URL=https://github.com/neovim/neovim/releases/download/${VERSION}/${FILENAME}
           echo "Downloading from $URL"
+          
+          # Download and extract
+          curl -fl "$URL" -o nvim.tar.gz
 
           # Extract archive into temp directory
           mkdir -p nvim-extract
