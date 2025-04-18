@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        neovim: ["stable", "v0.10.0", "nightly"]
+        neovim: ["stable", "nightly"]
 
     steps:
       - name: Checkout plugin
