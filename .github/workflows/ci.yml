@@ -29,7 +29,7 @@ jobs:
             URL=https://github.com/neovim/neovim/releases/download/${VERSION}/nvim-linux-x86_64.tar.gz
           fi
 
-          curl -LO $URL
+          curl -LO "$URL"
           tar xzf nvim-linux-x86_64.tar.gz
           sudo mv nvim-linux64 /opt/nvim
           echo "/opt/nvim/bin" >> $GITHUB_PATH
