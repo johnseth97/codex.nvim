@@ -32,7 +32,7 @@ return {
   lazy = true,
   keys = {
     {
-      '<leader>cc', -- Or any other keybinding
+      '<leader>cc',
       function()
         require('codex').toggle()
       end,
@@ -45,8 +45,8 @@ return {
       border = 'rounded',
       width = 0.8,
       height = 0.8,
-    },
-    autoinstall = true, -- <-- set to true to install codex automatically
+      autoinstall = true,
+    }
   end,
 }
 ```
