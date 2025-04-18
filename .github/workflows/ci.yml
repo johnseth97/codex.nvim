@@ -21,13 +21,20 @@ jobs:
       - name: Install Neovim ${{ matrix.neovim }}
         run: |
           VERSION=${{ matrix.neovim }}
-          URL=https://github.com/neovim/neovim/releases/download/${VERSION}/nvim-linux-x86_64.tar.gz
 
+          if [[ "$VERSION" == "v0."* ]]; then
+            FILENAME=nvim-linux64.tar.gz
+          else
+            FILENAME=nvim-linux-x86_64.tar.gz
+          fi
+
+          URL=https://github.com/neovim/neovim/releases/download/${VERSION}/${FILENAME}
           echo "Downloading from $URL"
-          curl -fL "$URL" -o nvim.tar.gz
 
+          curl -fL "$URL" -o nvim.tar.gz
           tar xzf nvim.tar.gz
-          sudo mv nvim-linux-x86_64 /opt/nvim
+          DIR=$(tar tf nvim.tar.gz | head -1 | cut -f1 -d"/")
+          sudo mv "$DIR" /opt/nvim
           echo "/opt/nvim/bin" >> $GITHUB_PATH
 
       - name: Install Plenary
