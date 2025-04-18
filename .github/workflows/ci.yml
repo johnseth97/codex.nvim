@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        neovim: ["stable", "nightly"]
+        neovim: ["stable", "v0.10.0", "nightly"]
 
     steps:
       - name: Checkout plugin
@@ -21,18 +21,14 @@ jobs:
       - name: Install Neovim ${{ matrix.neovim }}
         run: |
           VERSION=${{ matrix.neovim }}
-          if [ "$VERSION" = "nightly" ]; then
-            URL=https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz
-          elif [ "$VERSION" = "stable" ]; then
-            URL=https://github.com/neovim/neovim/releases/download/stable/nvim-linux-x86_64.tar.gz
-          else
-            URL=https://github.com/neovim/neovim/releases/download/${VERSION}/nvim-linux-x86_64.tar.gz
-          fi
+          URL=https://github.com/neovim/neovim/releases/download/${VERSION}/nvim-linux-x86_64.tar.gz
 
-          curl -LO "$URL"
-          tar xzf nvim-linux-x86_64.tar.gz
+          echo "Downloading from $URL"
+          curl -fL "$URL" -o nvim.tar.gz
+
+          tar xzf nvim.tar.gz
           sudo mv nvim-linux-x86_64 /opt/nvim
-          echo "/opt/nvim/bin" >> $GITHUB_PATH      - name: Verify Neovim version
+          echo "/opt/nvim/bin" >> $GITHUB_PATH
 
       - name: Install Plenary
         run: |
