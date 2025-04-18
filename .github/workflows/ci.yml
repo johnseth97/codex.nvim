@@ -31,10 +31,15 @@ jobs:
           URL=https://github.com/neovim/neovim/releases/download/${VERSION}/${FILENAME}
           echo "Downloading from $URL"
 
-          curl -fL "$URL" -o nvim.tar.gz
-          tar xzf nvim.tar.gz
-          DIR=$(tar tf nvim.tar.gz | head -1 | cut -f1 -d"/")
-          sudo mv "$DIR" /opt/nvim
+          # Extract archive into temp directory
+          mkdir -p nvim-extract
+          tar -xzf nvim.tar.gz -C nvim-extract
+
+          # Detect folder name
+          DIR=$(ls nvim-extract | head -1)
+
+          # Move to opt
+          sudo mv "nvim-extract/$DIR" /opt/nvim
           echo "/opt/nvim/bin" >> $GITHUB_PATH
 
       - name: Install Plenary
