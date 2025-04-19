@@ -20,23 +20,6 @@ local state = {
 
 function M.setup(user_config)
   config = vim.tbl_deep_extend('force', config, user_config or {})
-  -- auto-install codex CLI if requested and not already available
-  if config.autoinstall and vim.fn.executable(config.cmd) == 0 then
-    if vim.fn.executable('npm') == 1 then
-      vim.notify('[codex.nvim] installing codex CLI via npm...', vim.log.levels.INFO)
-      vim.fn.jobstart({'npm', 'install', '-g', '@openai/codex'}, {
-        on_exit = function(_, exit_code)
-          if exit_code == 0 then
-            vim.notify('[codex.nvim] codex CLI installed successfully', vim.log.levels.INFO)
-          else
-            vim.notify('[codex.nvim] failed to install codex CLI', vim.log.levels.ERROR)
-          end
-        end,
-      })
-    else
-      vim.notify('[codex.nvim] npm not found; cannot auto-install codex CLI', vim.log.levels.ERROR)
-    end
-  end
   -- define commands for toggling the Codex popup
   vim.api.nvim_create_user_command('Codex', function() M.toggle() end, { desc = 'Toggle Codex popup' })
   vim.api.nvim_create_user_command('CodexToggle', function() M.toggle() end, { desc = 'Toggle Codex popup (alias)' })
@@ -108,36 +91,49 @@ function M.open()
     if config.autoinstall then
       if vim.fn.executable('npm') == 1 then
         -- install via npm in the floating terminal to show output
-        state.job = vim.fn.termopen({'npm', 'install', '-g', '@openai/codex'}, {
-          cwd = vim.loop.cwd(),
-          on_exit = function(_, exit_code)
-            if exit_code == 0 then
-              vim.notify('[codex.nvim] codex CLI installed successfully', vim.log.levels.INFO)
-              -- automatically re-launch codex CLI now that it's installed
-              vim.schedule(function()
-                if state.win and vim.api.nvim_win_is_valid(state.win) then
-                  vim.api.nvim_set_current_win(state.win)
-                else
-                  open_window()
-                end
-                state.job = vim.fn.termopen(config.cmd, {
-                  cwd = vim.loop.cwd(),
-                  on_exit = function()
-                    state.job = nil
-                  end,
-                })
-              end)
-            else
-              vim.notify('[codex.nvim] failed to install codex CLI', vim.log.levels.ERROR)
-            end
-            state.job = nil
-          end,
-        })
+        do
+          local shell_cmd = vim.o.shell or 'sh'
+          local cmd = { shell_cmd, '-c', "echo 'Autoinstalling OpenAI Codex via npm...'; npm install -g @openai/codex" }
+          state.job = vim.fn.termopen(cmd, {
+            cwd = vim.loop.cwd(),
+            on_exit = function(_, exit_code)
+              if exit_code == 0 then
+                vim.notify('[codex.nvim] codex CLI installed successfully', vim.log.levels.INFO)
+                -- automatically re-launch codex CLI now that it's installed
+                vim.schedule(function()
+                  M.close()
+                  state.buf = nil
+                  M.open()
+                end)
+              else
+                vim.notify('[codex.nvim] failed to install codex CLI', vim.log.levels.ERROR)
+              end
+              state.job = nil
+            end,
+          })
+        end
       else
-        vim.notify('[codex.nvim] npm not found; cannot auto-install codex CLI', vim.log.levels.ERROR)
+        -- show installation instructions in the Codex popup
+        local msg = {
+          'npm not found; cannot auto-install Codex CLI.',
+          '',
+          'Please install via your system package manager, or manually run:',
+          '  npm install -g @openai/codex',
+        }
+        vim.api.nvim_buf_set_lines(state.buf, 0, -1, false, msg)
       end
     else
-      vim.notify('[codex.nvim] cannot find codex CLI; please install it or enable autoinstall', vim.log.levels.ERROR)
+      -- show instructions inline when autoinstall is disabled
+      local msg = {
+        'Codex CLI not found.',
+        '',
+        'Install with:',
+        '  npm install -g @openai/codex',
+        '',
+        'Or enable autoinstall in your plugin setup:',
+        '  require("codex").setup{ autoinstall = true }',
+      }
+      vim.api.nvim_buf_set_lines(state.buf, 0, -1, false, msg)
     end
     return
   end
