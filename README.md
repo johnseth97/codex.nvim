@@ -54,7 +54,7 @@ return {
 Usage:
 - Call `:Codex` (or `:CodexToggle`) to open or close the Codex popup.
 -- Map your own keybindings via the `keymaps.toggle` setting.
-- Add to your statusline:
-```vim
-set statusline+=%{v:lua.require'codex'.statusline()}
+- Add lualinenotifier to show backgrounded Codex window:
+```lua
+require('codex').status() -- drop in to your lualine sections
 ```
