@@ -170,4 +170,19 @@ function M.statusline()
   return ''
 end
 
+--- Return a lualine.nvim component for displaying Codex status
+-- Usage: table.insert(opts.sections.lualine_x, require('codex').status())
+function M.status()
+  return {
+    -- component function
+    function() return M.statusline() end,
+    -- only show when Codex job is running in background
+    cond = function() return M.statusline() ~= '' end,
+    -- gear icon
+    icon = '',
+    -- default color (blue)
+    color = { fg = '#51afef' },
+  }
+end
+
 return M
