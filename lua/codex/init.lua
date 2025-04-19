@@ -113,6 +113,20 @@ function M.open()
           on_exit = function(_, exit_code)
             if exit_code == 0 then
               vim.notify('[codex.nvim] codex CLI installed successfully', vim.log.levels.INFO)
+              -- automatically re-launch codex CLI now that it's installed
+              vim.schedule(function()
+                if state.win and vim.api.nvim_win_is_valid(state.win) then
+                  vim.api.nvim_set_current_win(state.win)
+                else
+                  open_window()
+                end
+                state.job = vim.fn.termopen(config.cmd, {
+                  cwd = vim.loop.cwd(),
+                  on_exit = function()
+                    state.job = nil
+                  end,
+                })
+              end)
             else
               vim.notify('[codex.nvim] failed to install codex CLI', vim.log.levels.ERROR)
             end
