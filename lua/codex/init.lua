@@ -210,32 +210,30 @@ function M.toggle()
 	end
 end
 
--- Dynamic lualine.nvim component for Codex status
--- Use in lualine config as: table.insert(opts.sections.lualine_x, require('codex').lualine)
--- Shows [Codex] when the Codex CLI job is running.
--- Green when waiting on input prompt (floating window open),
--- Yellow when waiting for action/approval (job running, window closed).
-M.lualine = {
-	-- component function: show [Codex] when background job is running
-	function()
-		if state.job then
-			return "[Codex]"
-		end
-		return ""
-	end,
+function M.statusline()
+	if state.job and not (state.win and vim.api.nvim_win_is_valid(state.win)) then
+		return "[Codex]"
+	end
+	return ""
+end
 
-	-- only show when a background job exists
-	cond = function()
-		return state.job
-	end,
-	icon = "",
-	color = function()
-		if state.win and vim.api.nvim_win_is_valid(state.win) then
-			return { fg = "#98c379" }
-		else
-			return { fg = "#e5c07b" }
-		end
-	end,
-}
+--- Return a lualine.nvim component for displaying Codex status
+-- Usage: table.insert(opts.sections.lualine_x, require('codex').status())
+function M.status()
+	return {
+		-- component function
+		function()
+			return M.statusline()
+		end,
+		-- only show when Codex job is running in background
+		cond = function()
+			return M.statusline() ~= ""
+		end,
+		-- gear icon
+		icon = "",
+		-- default color (blue)
+		color = { fg = "#51afef" },
+	}
+end
 
 return M
