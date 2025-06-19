@@ -47,8 +47,6 @@ describe('codex.nvim', function()
 
     assert(vim.api.nvim_win_is_valid(win1), 'Codex window should be open')
 
-    print('🔍 buffer modified before toggle:', vim.api.nvim_buf_get_option(buf, 'modified'))
-
     -- Optional: manually mark it clean
     vim.api.nvim_buf_set_option(buf, 'modified', false)
 
