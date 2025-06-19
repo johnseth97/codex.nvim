@@ -13,7 +13,7 @@ test:
 	$(LUAROCKS_ENV) && nvim --headless $(EXTRA_RTP) -u tests/minimal_init.lua -c "PlenaryBustedDirectory tests/specs/"
 
 coverage:
-	$(LUAROCKS_ENV) && nvim --headless $(EXTRA_RTP) -u tests/minimal_init.lua -c "luafile tests/run_cov.lua"
+	$(LUAROCKS_ENV) && nvim --headless $(EXTRA_RTP) -u tests/minimal_init.lua -c "silent! luafile tests/run_cov.lua"
 	ls -lh luacov.stats.out
 	$(LUAROCKS_ENV) && luacov -t LcovReporter
 	@echo "Generated coverage report: lcov.info"
