@@ -84,6 +84,16 @@ local function open_window()
 end
 
 function M.open()
+  local function create_clean_buf()
+    local buf = vim.api.nvim_create_buf(false, false)
+    vim.api.nvim_buf_set_option(buf, 'bufhidden', 'hide')
+    vim.api.nvim_buf_set_option(buf, 'swapfile', false)
+    vim.api.nvim_buf_set_option(buf, 'filetype', 'codex')
+    vim.api.nvim_buf_set_keymap(buf, 't', 'q', [[<C-\><C-n><cmd>lua require('codex').close()<CR>]], { noremap = true, silent = true })
+    vim.api.nvim_buf_set_keymap(buf, 'n', 'q', [[<cmd>lua require('codex').close()<CR>]], { noremap = true, silent = true })
+    return buf
+  end
+
   if state.win and vim.api.nvim_win_is_valid(state.win) then
     vim.api.nvim_set_current_win(state.win)
     return
@@ -99,7 +109,7 @@ function M.open()
         else
           -- Show failure message *after* buffer is created
           if not state.buf or not vim.api.nvim_buf_is_valid(state.buf) then
-            state.buf = vim.api.nvim_create_buf(false, false)
+            state.buf = create_clean_buf()
           end
           vim.api.nvim_buf_set_lines(state.buf, 0, -1, false, {
             'Autoinstall cancelled or failed.',
@@ -129,42 +139,37 @@ function M.open()
     end
   end
 
-  -- At this point, CLI is available: safe to setup buffer and window
-  local function create_clean_buf()
-    local buf = vim.api.nvim_create_buf(false, false)
-    vim.api.nvim_buf_set_option(buf, 'bufhidden', 'hide')
-    vim.api.nvim_buf_set_option(buf, 'swapfile', false)
-    vim.api.nvim_buf_set_option(buf, 'filetype', 'codex')
-    vim.api.nvim_buf_set_keymap(buf, 't', '<Esc>', [[<C-\><C-n><cmd>lua require('codex').close()<CR>]], { noremap = true, silent = true })
-    vim.api.nvim_buf_set_keymap(buf, 'n', '<Esc>', [[<cmd>lua require('codex').close()<CR>]], { noremap = true, silent = true })
-    return buf
+  local function is_buf_reusable(buf)
+    return type(buf) == 'number' and vim.api.nvim_buf_is_valid(buf)
   end
 
-  -- Replace dirty or invalid buffer
-  if not state.buf or not vim.api.nvim_buf_is_valid(state.buf) or vim.api.nvim_buf_get_option(state.buf, 'modified') then
+  if not is_buf_reusable(state.buf) then
     state.buf = create_clean_buf()
   end
+
   open_window()
 
-  local cmd_args = type(config.cmd) == 'string' and { config.cmd } or vim.deepcopy(config.cmd)
-  if config.model then
-    table.insert(cmd_args, '-m')
-    table.insert(cmd_args, config.model)
-  end
+  if not state.job then
+    local cmd_args = type(config.cmd) == 'string' and { config.cmd } or vim.deepcopy(config.cmd)
+    if config.model then
+      table.insert(cmd_args, '-m')
+      table.insert(cmd_args, config.model)
+    end
 
-  state.job = vim.fn.termopen(cmd_args, {
-    cwd = vim.loop.cwd(),
-    on_exit = function()
-      state.job = nil
-    end,
-  })
+    state.job = vim.fn.termopen(cmd_args, {
+      cwd = vim.loop.cwd(),
+      on_exit = function()
+        state.job = nil
+      end,
+    })
+  end
 end
 
 function M.close()
   if state.win and vim.api.nvim_win_is_valid(state.win) then
     vim.api.nvim_win_close(state.win, true)
-    state.win = nil
   end
+  state.win = nil
 end
 
 function M.toggle()
