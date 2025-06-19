@@ -19,10 +19,10 @@ describe('codex.nvim multi-installer matrix flow', function()
       local code = success and 0 or 1
       vim.defer_fn(function()
         if opts.on_exit then
-          opts.on_exit(code, code == 0 and 'success' or 'fail')
+          opts.on_exit(1234, code) -- job_id, exit_code
         end
       end, 10)
-      return 1234 -- fake job id
+      return 1234
     end
   end)
 
