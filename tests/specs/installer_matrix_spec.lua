@@ -48,6 +48,14 @@ describe('codex.nvim multi-installer matrix flow', function()
         return state.job == nil
       end)
 
+      local found_notice = false
+      for _, entry in ipairs(_G.__codex_notify_log) do
+        if entry.msg:match 'Installation failed' and entry.msg:match(pm) then
+          found_notice = true
+          break
+        end
+      end
+
       local success_pms = {
         npm = true,
         pnpm = true,
@@ -58,14 +66,6 @@ describe('codex.nvim multi-installer matrix flow', function()
         assert(found_notice, 'Failure should notify for ' .. pm)
       else
         assert(not found_notice, 'Should not show failure notice for successful PM: ' .. pm)
-      end
-
-      local found_notice = false
-      for _, entry in ipairs(_G.__codex_notify_log) do
-        if entry.msg:match 'Installation failed' and entry.msg:match(pm) then
-          found_notice = true
-          break
-        end
       end
 
       if pm ~= 'npm' then
