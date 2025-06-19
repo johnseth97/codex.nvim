@@ -24,6 +24,8 @@ clean:
 
 install-deps:
 	luarocks --lua-version=5.1 install luacov || true
+	luarocks --lua-version=5.1 install luacov-reporter-lcov || true
+	luarocks --lua-version=5.1 install luacheck || true
 	if [ ! -d ~/.local/share/nvim/lazy ]; then
 		mkdir -p ~/.local/share/nvim/lazy
 	fi
