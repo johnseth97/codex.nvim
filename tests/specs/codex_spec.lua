@@ -59,7 +59,7 @@ describe('codex.nvim', function()
   end)
 
   it('shows statusline only when job is active but window is not', function()
-    require('codex').setup { cmd = 'sleep', '1000' }
+    require('codex').setup { cmd = { 'sleep', '1000' } }
     require('codex').open()
 
     vim.defer_fn(function()
