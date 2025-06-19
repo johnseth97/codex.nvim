@@ -7,7 +7,7 @@
 LUAROCKS_ENV = eval "$(luarocks --lua-version=5.1 path)"
 
 # Headless Neovim test runner
-NVIM_TEST_CMD = nvim --headless -u tests/minimal_init.lua -c "PlenaryBustedDirectory tests/"
+NVIM_TEST_CMD = nvim --headless -u tests/minimal_init.lua -c "PlenaryBustedDirectory tests/specs/"
 
 .PHONY: test coverage clean
 
