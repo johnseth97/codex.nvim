@@ -27,7 +27,7 @@ jobs:
         run: |
             corepack enable
             corepack prepare pnpm@latest --activate
-            corepack prepare yarn@stable --activate          npm install --no-save -g pnpm@latest
+            corepack prepare yarn@stable --activate
 
       - name: Install Neovim ${{ matrix.neovim }}
         run: |
