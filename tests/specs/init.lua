@@ -4,6 +4,8 @@
 local async = require 'plenary.async.tests'
 
 describe('codex.nvim', function()
+  require('codex.installer').__test_ignore_path_check = true -- Skip path checks for tests
+
   it('should load without errors', function()
     require 'codex'
   end)

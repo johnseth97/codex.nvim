@@ -5,7 +5,6 @@ describe('codex.nvim multi-installer matrix flow', function()
   before_each(function()
     vim.cmd 'set noswapfile'
     vim.cmd 'silent! bwipeout!'
-    require('codex.installer').__test_ignore_path_check = true -- Skip path checks for tests
 
     -- Capture notify messages for assertions
     _G.__codex_notify_log = {}

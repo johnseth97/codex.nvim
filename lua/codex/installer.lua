@@ -129,6 +129,11 @@ function M.run_install(pm, on_success)
         end
       else
         vim.notify('[codex.nvim] Installation failed via ' .. pm, vim.log.levels.ERROR)
+        if not M.__test_ignore_path_check then
+          vim.schedule(function()
+            vim.cmd 'cquit 1'
+          end)
+        end
       end
       state.job = nil
     end,
