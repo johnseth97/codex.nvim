@@ -23,11 +23,11 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install npm, yarn and pnmp globally
+      - name: Setup package managers with Corepack
         run: |
-          corepack enable
-          npm install --no-save -g yarn@latest
-          npm install --no-save -g pnpm@latest
+            corepack enable
+            corepack prepare pnpm@latest --activate
+            corepack prepare yarn@stable --activate          npm install --no-save -g pnpm@latest
 
       - name: Install Neovim ${{ matrix.neovim }}
         run: |
