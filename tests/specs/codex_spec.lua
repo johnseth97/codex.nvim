@@ -79,7 +79,7 @@ describe('codex.nvim', function()
         received_cmd = cmd
         if type(opts.on_exit) == 'function' then
           vim.defer_fn(function()
-            opts.on_exit(0)
+            opts.on_exit(42, 0)
           end, 10)
         end
         return 123
