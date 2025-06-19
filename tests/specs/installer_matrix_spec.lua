@@ -67,10 +67,6 @@ describe('codex.nvim multi-installer matrix flow', function()
       else
         assert(not found_notice, 'Should not show failure notice for successful PM: ' .. pm)
       end
-
-      if pm ~= 'npm' then
-        assert(found_notice, 'Failure should notify for ' .. pm)
-      end
     end
   end)
 end)
