@@ -4,6 +4,8 @@
 ## A Neovim plugin integrating the open-sourced Codex CLI (`codex`).
 > Latest version: ![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/johnseth97/codex.nvim?sort=semver)
 
+Note: As of v1.0.0, <Esc> no longer closes the Codex window. Press q to close, and <Esc><Esc> to safely interrupt model generation without resetting context.
+
 ### Features:
 - ✅ Toggle Codex floating window with `:CodexToggle`
 - ✅ Optional keymap mapping via `setup` call
@@ -53,6 +55,13 @@ return {
 - Call `:Codex` (or `:CodexToggle`) to open or close the Codex popup.
 -- Map your own keybindings via the `keymaps.toggle` setting.
 - Add the following code to show backgrounded Codex window in lualine:
+
 ```lua
 require('codex').status() -- drop in to your lualine sections
 ```
+
+### Configuration:
+- All plugin configurations can be seen in the `opts` table of the plugin setup, as shown in the installation section.
+
+- **For deeper customization, please refer to the [Codex CLI documentation](https://github.com/openai/codex?tab=readme-ov-file#full-configuration-example) full configuration example. These features change quickly as Codex CLI is in active beta development.*
+
