@@ -18,6 +18,17 @@ jobs:
       - name: Checkout plugin
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install npm, yarn and pnmp globally
+        run: |
+          corepack enable
+          npm install --no-save -g yarn@latest
+          npm install --no-save -g pnpm@latest
+
       - name: Install Neovim ${{ matrix.neovim }}
         run: |
           set -euo pipefail
