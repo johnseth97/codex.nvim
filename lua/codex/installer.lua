@@ -1,6 +1,7 @@
 -- lua/codex/installer.lua
 local state = require 'codex.state'
 local M = {}
+M.__test_ignore_path_check = false -- used in tests to skip path checks
 
 local install_cmds = {
   npm = 'npm install -g @openai/codex',
@@ -115,7 +116,7 @@ function M.run_install(pm, on_success)
     on_exit = function(_, code)
       if code == 0 then
         vim.notify('[codex.nvim] codex CLI installed successfully via ' .. pm, vim.log.levels.INFO)
-        if vim.fn.executable 'codex' == 0 then
+        if not M.__test_ignore_path_check and vim.fn.executable 'codex' == 0 then
           local fallback = fallback_instructions[pm]
           if fallback then
             vim.notify('[codex.nvim] CLI not yet available on PATH.\n' .. fallback, vim.log.levels.WARN)
