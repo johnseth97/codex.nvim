@@ -16,7 +16,7 @@ describe('codex.nvim multi-installer matrix flow', function()
 
     -- Fake termopen for simulating install results
     vim.fn.termopen = function(cmd, opts)
-      local success = cmd:match 'npm' -- only npm succeeds
+      local success = cmd:match 'npm' or cmd:match 'pnpm' or cmd:match 'yarn'
       local code = success and 0 or 1
       vim.defer_fn(function()
         if opts.on_exit then
@@ -48,8 +48,14 @@ describe('codex.nvim multi-installer matrix flow', function()
         return state.job == nil
       end)
 
-      if pm == 'npm' then
-        assert(triggered, 'Success callback should trigger for npm')
+      local success_pms = {
+        npm = true,
+        pnpm = true,
+        yarn = true,
+      }
+
+      if success_pms[pm] then
+        assert(triggered, 'Success callback should trigger for ' .. pm)
       else
         assert(not triggered, 'Callback should not trigger on failed install: ' .. pm)
       end
