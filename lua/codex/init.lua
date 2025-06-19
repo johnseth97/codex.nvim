@@ -10,6 +10,7 @@ local config = {
   width = 0.8,
   height = 0.8,
   cmd = 'codex',
+  model = nil, -- Default to the latest model
   autoinstall = true,
 }
 
@@ -37,13 +38,13 @@ local function open_window()
 
   local styles = {
     single = {
-      { '╭', 'FloatBorder' },
+      { '┌', 'FloatBorder' },
       { '─', 'FloatBorder' },
-      { '╮', 'FloatBorder' },
+      { '┐', 'FloatBorder' },
       { '│', 'FloatBorder' },
-      { '╯', 'FloatBorder' },
+      { '┘', 'FloatBorder' },
       { '─', 'FloatBorder' },
-      { '╰', 'FloatBorder' },
+      { '└', 'FloatBorder' },
       { '│', 'FloatBorder' },
     },
     double = {
@@ -129,26 +130,36 @@ function M.open()
   end
 
   -- At this point, CLI is available: safe to setup buffer and window
-  if not state.buf or not vim.api.nvim_buf_is_valid(state.buf) then
-    state.buf = vim.api.nvim_create_buf(false, false)
-    vim.api.nvim_buf_set_option(state.buf, 'bufhidden', 'hide')
-    vim.api.nvim_buf_set_option(state.buf, 'swapfile', false)
-    vim.api.nvim_buf_set_option(state.buf, 'filetype', 'codex')
-    vim.api.nvim_buf_set_keymap(state.buf, 't', '<Esc>', [[<C-\><C-n><cmd>lua require('codex').close()<CR>]], { noremap = true, silent = true })
-    vim.api.nvim_buf_set_keymap(state.buf, 'n', '<Esc>', [[<cmd>lua require('codex').close()<CR>]], { noremap = true, silent = true })
+  local function create_clean_buf()
+    local buf = vim.api.nvim_create_buf(false, false)
+    vim.api.nvim_buf_set_option(buf, 'bufhidden', 'hide')
+    vim.api.nvim_buf_set_option(buf, 'swapfile', false)
+    vim.api.nvim_buf_set_option(buf, 'filetype', 'codex')
+    vim.api.nvim_buf_set_keymap(buf, 't', '<Esc>', [[<C-\><C-n><cmd>lua require('codex').close()<CR>]], { noremap = true, silent = true })
+    vim.api.nvim_buf_set_keymap(buf, 'n', '<Esc>', [[<cmd>lua require('codex').close()<CR>]], { noremap = true, silent = true })
+    return buf
   end
 
+  -- Replace dirty or invalid buffer
+  if not state.buf or not vim.api.nvim_buf_is_valid(state.buf) or vim.api.nvim_buf_get_option(state.buf, 'modified') then
+    state.buf = create_clean_buf()
+  end
   open_window()
 
-  if not state.job then
-    state.job = vim.fn.termopen(config.cmd, {
-      cwd = vim.loop.cwd(),
-      on_exit = function()
-        state.job = nil
-      end,
-    })
+  local cmd_args = type(config.cmd) == 'string' and { config.cmd } or vim.deepcopy(config.cmd)
+  if config.model then
+    table.insert(cmd_args, '-m')
+    table.insert(cmd_args, config.model)
   end
+
+  state.job = vim.fn.termopen(cmd_args, {
+    cwd = vim.loop.cwd(),
+    on_exit = function()
+      state.job = nil
+    end,
+  })
 end
+
 function M.close()
   if state.win and vim.api.nvim_win_is_valid(state.win) then
     vim.api.nvim_win_close(state.win, true)
