@@ -39,6 +39,8 @@ local function safe_quit(code)
     io.stderr:write('Failed to quit Neovim cleanly: ', quit_err, '\n')
     os.exit(code or 0)
   end
+  -- In case cquit was no-op (in CI or headless mode), exit explicitly
+  os.exit(code or 0)
 end
 
 safe_quit(0)
