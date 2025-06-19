@@ -1,21 +1,19 @@
 # Makefile for codex.nvim testing and coverage
-# Usage:
-#   make test      - run unit tests
-#   make coverage  - run tests + generate coverage (luacov + lcov.info)
 
 # Force correct Lua version for Neovim (Lua 5.1)
 LUAROCKS_ENV = eval "$(luarocks --lua-version=5.1 path)"
 
-# Headless Neovim test runner
-NVIM_TEST_CMD = nvim --headless -u tests/minimal_init.lua -c "PlenaryBustedDirectory tests/specs/"
+# Add Lazy-installed plenary.nvim to runtimepath
+PLENARY_PATH = ~/.local/share/nvim/lazy/plenary.nvim
+EXTRA_RTP = --cmd "set rtp+=$(PLENARY_PATH)"
 
-.PHONY: test coverage clean
+.PHONY: test coverage clean install-deps
 
 test:
-	$(LUAROCKS_ENV) && $(NVIM_TEST_CMD)
+	$(LUAROCKS_ENV) && nvim --headless $(EXTRA_RTP) -u tests/minimal_init.lua -c "PlenaryBustedDirectory tests/specs/"
 
 coverage:
-	$(LUAROCKS_ENV) && nvim --headless -u tests/minimal_init.lua -c "luafile tests/run_cov.lua"
+	$(LUAROCKS_ENV) && nvim --headless $(EXTRA_RTP) -u tests/minimal_init.lua -c "luafile tests/run_cov.lua"
 	ls -lh luacov.stats.out
 	$(LUAROCKS_ENV) && luacov -t LcovReporter
 	@echo "Generated coverage report: lcov.info"
@@ -26,4 +24,7 @@ clean:
 
 install-deps:
 	luarocks --lua-version=5.1 install luacov || true
-	git clone https://github.com/nvim-lua/plenary.nvim tests/plenary.nvim || true
+	if [ ! -d ~/.local/share/nvim/lazy ]; then
+		mkdir -p ~/.local/share/nvim/lazy
+	fi
+	git clone https://github.com/nvim-lua/plenary.nvim ~/.local/share/nvim/lazy/plenary.nvim || true

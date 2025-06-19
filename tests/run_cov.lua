@@ -13,19 +13,11 @@ runner.init {
 
 -- 3) Helper to invoke Plenary’s harness
 local harness = require 'plenary.test_harness'
-
 local function run_tests()
   if type(harness.run) == 'function' then
-    harness.run {
-      minimal_init = 'tests/minimal_init.lua',
-      sequential = true,
-      dir = 'tests/specs', -- <-- run only your specs
-    }
+    harness.run() -- Plenary ≤2023‑11
   else
-    harness.test_directory('tests/specs', {
-      minimal_init = 'tests/minimal_init.lua',
-      sequential = true,
-    })
+    harness.test_directory('tests', {}) -- Plenary ≥2023‑12
   end
 end
 
