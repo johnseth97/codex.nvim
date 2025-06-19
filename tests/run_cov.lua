@@ -32,5 +32,13 @@ if not ok then
   error('Test runner failed:\n' .. err)
 end
 
--- 7) Quit *all* windows and exit Neovim cleanly
-vim.cmd 'qa!'
+-- 7) Graceful exit: use `cquit 0` or `cquit 1` depending on test success
+local function safe_quit(code)
+  local ok_quit, quit_err = pcall(vim.cmd, 'cquit ' .. tostring(code or 0))
+  if not ok_quit then
+    io.stderr:write('Failed to quit Neovim cleanly: ', quit_err, '\n')
+    os.exit(code or 0)
+  end
+end
+
+safe_quit(0)
