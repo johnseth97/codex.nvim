@@ -43,21 +43,21 @@ describe('codex.nvim', function()
 
     require('codex').toggle()
     local win1 = vim.api.nvim_get_current_win()
+    local buf = vim.api.nvim_win_get_buf(win1)
+
     assert(vim.api.nvim_win_is_valid(win1), 'Codex window should be open')
 
-    -- Force-close and clear buffer tracking
-    require('codex').close()
-    require('codex.state').buf = nil
+    print('🔍 buffer modified before toggle:', vim.api.nvim_buf_get_option(buf, 'modified'))
 
-    -- Wait briefly for teardown
-    vim.wait(50)
+    -- Optional: manually mark it clean
+    vim.api.nvim_buf_set_option(buf, 'modified', false)
 
     require('codex').toggle()
-    local win2 = vim.api.nvim_get_current_win()
-    assert(vim.api.nvim_win_is_valid(win2), 'Codex window should be reopened')
 
-    require('codex').close()
+    local ok, _ = pcall(vim.api.nvim_win_get_buf, win1)
+    assert(not ok, 'Codex window should be closed')
   end)
+
   it('shows statusline only when job is active but window is not', function()
     require('codex').setup { cmd = 'sleep', '1000' }
     require('codex').open()
