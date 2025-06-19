@@ -15,7 +15,7 @@ describe('codex.nvim multi-installer matrix flow', function()
 
     -- Fake termopen for simulating install results
     vim.fn.termopen = function(cmd, opts)
-      local success = cmd:match 'npm' or cmd:match 'pnpm' or cmd:match 'yarn'
+      local success = cmd:match 'npm' or cmd:match 'pnpm' or cmd:match 'yarn' or cmd:match 'bun' or cmd:match 'deno'
       local code = success and 0 or 1
       vim.defer_fn(function()
         if opts.on_exit then
@@ -59,6 +59,8 @@ describe('codex.nvim multi-installer matrix flow', function()
         npm = true,
         pnpm = true,
         yarn = true,
+        bun = true,
+        deno = true,
       }
 
       if not success_pms[pm] then
