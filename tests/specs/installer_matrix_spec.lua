@@ -54,10 +54,10 @@ describe('codex.nvim multi-installer matrix flow', function()
         yarn = true,
       }
 
-      if success_pms[pm] then
-        assert(triggered, 'Success callback should trigger for ' .. pm)
+      if not success_pms[pm] then
+        assert(found_notice, 'Failure should notify for ' .. pm)
       else
-        assert(not triggered, 'Callback should not trigger on failed install: ' .. pm)
+        assert(not found_notice, 'Should not show failure notice for successful PM: ' .. pm)
       end
 
       local found_notice = false
