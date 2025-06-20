@@ -69,27 +69,11 @@ jobs:
           set -euo pipefail
           sudo apt-get update
           sudo apt-get install -y lua5.1 liblua5.1-0-dev luarocks
-          luarocks --lua-version=5.1 --local install luacheck
-          luarocks --lua-version=5.1 --local install luacov
-          luarocks --lua-version=5.1 --local install luacov-reporter-lcov
-          echo "$HOME/.luarocks/bin" >> $GITHUB_PATH
+          make install-deps
 
       - name: Run tests with coverage
         run: |
-          eval "$(luarocks --lua-version=5.1 path)"
-          luarocks --lua-version=5.1 list # debug
-          nvim --headless -u tests/minimal_init.lua -c "luafile tests/run_cov.lua"
-
-          luacov -r lcov > lcov.info
-          sed -i 's|SF:.*/codex.nvim/codex.nvim/|SF:|g' lcov.info
-          head -n 10 lcov.info # debug
-
-          # Debug output
-          echo "=== first 20 lines of lcov.info ==="
-          head -n 20 lcov.info
-
-          echo "=== all source-file entries ==="
-          grep '^SF:' lcov.info | sed -e 's/^SF://g' | sort | uniq | head -n 10
+          make coverage
 
       - name: Upload code coverage
         uses: codecov/codecov-action@v4
