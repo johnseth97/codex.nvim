@@ -3,7 +3,6 @@ local a = require 'plenary.async.tests'
 describe('codex.nvim cold start installer flow', function()
   before_each(function()
     vim.cmd 'set noswapfile'
-    vim.cmd 'silent! bwipeout!'
 
     -- Mock termopen to simulate successful install
     vim.fn.termopen = function(_, opts)
@@ -19,5 +18,25 @@ describe('codex.nvim cold start installer flow', function()
     vim.ui.select = function(items, _, on_choice)
       on_choice 'npm'
     end
+  end)
+
+  it('installs via selected PM and opens the window', function()
+    local codex = require 'codex'
+    codex.setup {
+      cmd = 'codex',
+      autoinstall = true,
+    }
+
+    codex.open()
+
+    vim.wait(1000, function()
+      return require('codex.state').job == nil and require('codex.state').win ~= nil
+    end, 10)
+
+    local win = require('codex.state').win
+    assert(win and vim.api.nvim_win_is_valid(win), 'Codex window should be open after install')
+
+    codex.close()
+    assert(not vim.api.nvim_win_is_valid(win), 'Codex window should be closed')
   end)
 end)

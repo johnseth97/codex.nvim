@@ -72,6 +72,12 @@ jobs:
           sudo apt-get install -y lua5.1 liblua5.1-0-dev luarocks
           make install-deps
 
+      - name: Add PM global bin paths
+        run: |
+          echo "$(npm bin -g)" >> $GITHUB_PATH
+          echo "$(pnpm bin -g)" >> $GITHUB_PATH
+          echo "$(yarn global bin)" >> $GITHUB_PATH
+
       - name: Run tests with coverage
         run: |
           make coverage
