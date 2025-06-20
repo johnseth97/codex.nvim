@@ -89,6 +89,15 @@ jobs:
           which luacov || echo "luacov still not found"
           luacov -t LcovReporter > lcov.info
           ls -l lcov.info
+
+
+      - name: Upload code coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: lcov.info               # <-- new file
+          disable_search: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+
   release:
     name: Semantic Release
     runs-on: ubuntu-latest
