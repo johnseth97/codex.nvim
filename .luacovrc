@@ -4,3 +4,4 @@ reportfile = "luacov.report.out"
 
 [lcovreport]
 output = "lcov.info"
+include = "lua/codex/"

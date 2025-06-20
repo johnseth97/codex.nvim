@@ -5,7 +5,7 @@ return {
 
   -- collect coverage only for plugin source
   include = {
-    "lua/",
+    "lua/codex",
   },
 
   -- ignore test helpers and specs
