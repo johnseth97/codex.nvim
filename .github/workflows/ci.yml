@@ -82,6 +82,15 @@ jobs:
         run: |
           make coverage
 
+      - name: Debug coverage outputs
+        run: |
+          echo "Listing files in $(pwd):"
+          find . -type f
+          echo "Check for luacov stats:"
+          find . -name "luacov.stats.out"
+          echo "Check for lcov.info:"
+          find . -name "lcov.info"``
+
       - name: Upload code coverage
         uses: codecov/codecov-action@v4
         with:
