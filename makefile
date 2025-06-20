@@ -26,5 +26,7 @@ clean:
 	@echo "Cleaned coverage artifacts"
 
 install-deps:
-	luarocks --lua-version=5.1 install luacov || true
+	luarocks --lua-version=5.1 install --local luacov
+	luarocks --lua-version=5.1 install --local luacov-reporter-lcov
+	luarocks --lua-version=5.1 install --local luacheck	
 	git clone https://github.com/nvim-lua/plenary.nvim tests/plenary.nvim || true
