@@ -82,15 +82,18 @@ jobs:
         run: |
           make coverage
 
-      - name: Debug coverage outputs
+      - name: 🔍 Show luacov-lcov reporter output
         run: |
-          echo "Listing files in $(pwd):"
-          find . -type f
-          echo "Check for luacov stats:"
-          find . -name "luacov.stats.out"
-          echo "Check for lcov.info:"
-          find . -name "lcov.info"``
+          echo "Running luacov-lcov manually:"
+          ls -l luacov.stats.out || echo "No stats file"
+          luarocks list | grep luacov || echo "luacov not installed?"
+          luacov -t LcovReporter > lcov.info 2> lcov.stderr.log || echo "luacov failed"
 
+    echo "Output file?"
+    ls -l lcov.info || echo "lcov.info not generated"
+
+    echo "stderr from luacov:"
+    cat lcov.stderr.log
       - name: Upload code coverage
         uses: codecov/codecov-action@v4
         with:
