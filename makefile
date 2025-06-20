@@ -15,7 +15,7 @@ test:
 	  nvim --headless -u tests/minimal_init.lua -c "PlenaryBustedDirectory tests/"'
 
 coverage:
-	@bash -c 'eval "$$(luarocks --lua-version=5.1 path)" && \
+	@bash -c 'eval "$$(luarocks --lua-version=5.1 path --bin)" && \
 	  nvim --headless -u tests/minimal_init.lua -c "luafile tests/run_cov.lua" || exit 0 && \
 	  if [ -f luacov.stats.out ]; then \
 	    echo "::group::Coverage"; \
