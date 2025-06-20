@@ -4,7 +4,6 @@
 #   make coverage  - run tests + generate coverage (luacov + lcov.info)
 
 # Force correct Lua version for Neovim (Lua 5.1)
-LUAROCKS_ENV = eval "$(luarocks --lua-version=5.1 path)"
 
 # Headless Neovim test runner
 NVIM_TEST_CMD = nvim --headless -u tests/minimal_init.lua -c "PlenaryBustedDirectory tests/"
@@ -12,12 +11,14 @@ NVIM_TEST_CMD = nvim --headless -u tests/minimal_init.lua -c "PlenaryBustedDirec
 .PHONY: test coverage clean
 
 test:
-	$(LUAROCKS_ENV) && $(NVIM_TEST_CMD)
+	@bash -c 'eval "$$(luarocks --lua-version=5.1 path)" && \
+	  nvim --headless -u tests/minimal_init.lua -c "PlenaryBustedDirectory tests/"'
 
 coverage:
-	$(LUAROCKS_ENV) && nvim --headless -u tests/minimal_init.lua -c "luafile tests/run_cov.lua"
-	ls -lh luacov.stats.out
-	$(LUAROCKS_ENV) && luacov -t LcovReporter
+	@bash -c 'eval "$$(luarocks --lua-version=5.1 path)" && \
+	  nvim --headless -u tests/minimal_init.lua -c "luafile tests/run_cov.lua" && \
+	  luacov -t LcovReporter'
+	@ls -lh luacov.stats.out
 	@echo "Generated coverage report: lcov.info"
 
 clean:
