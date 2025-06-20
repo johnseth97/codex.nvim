@@ -23,10 +23,10 @@ clean:
 	@echo "Cleaned coverage artifacts"
 
 install-deps:
-	luarocks --lua-version=5.1 install luacov || true
-	luarocks --lua-version=5.1 install luacov-reporter-lcov || true
-	luarocks --lua-version=5.1 install luacheck || true
-	if [ ! -d ~/.local/share/nvim/lazy ]; then
-		mkdir -p ~/.local/share/nvim/lazy
-	fi
+	luarocks --lua-version=5.1 install luacov --local || true
+	luarocks --lua-version=5.1 install luacov-reporter-lcov --local || true
+	luarocks --lua-version=5.1 install luacheck --local || true
+	if [ ! -d ~/.local/share/nvim/lazy ]; then; \
+		mkdir -p ~/.local/share/nvim/lazy; \
+	fi \
 	git clone https://github.com/nvim-lua/plenary.nvim ~/.local/share/nvim/lazy/plenary.nvim || true
