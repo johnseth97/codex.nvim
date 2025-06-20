@@ -1,21 +1,24 @@
 # Makefile for codex.nvim testing and coverage
+# Usage:
+#   make test      - run unit tests
+#   make coverage  - run tests + generate coverage (luacov + lcov.info)
 
 # Force correct Lua version for Neovim (Lua 5.1)
-LUAROCKS_ENV = eval "$(luarocks --lua-version=5.1 path)"
 
-# Add Lazy-installed plenary.nvim to runtimepath
-PLENARY_PATH = ~/.local/share/nvim/lazy/plenary.nvim
-EXTRA_RTP = --cmd "set rtp+=$(PLENARY_PATH)"
+# Headless Neovim test runner
+NVIM_TEST_CMD = nvim --headless -u tests/minimal_init.lua -c "PlenaryBustedDirectory tests/"
 
-.PHONY: test coverage clean install-deps
+.PHONY: test coverage clean
 
 test:
-	$(LUAROCKS_ENV) && nvim --headless $(EXTRA_RTP) -u tests/minimal_init.lua -c "PlenaryBustedDirectory tests/specs/"
+	@bash -c 'eval "$$(luarocks --lua-version=5.1 path)" && \
+	  nvim --headless -u tests/minimal_init.lua -c "PlenaryBustedDirectory tests/"'
 
 coverage:
-	$(LUAROCKS_ENV) && nvim --headless $(EXTRA_RTP) -u tests/minimal_init.lua -c "silent! luafile tests/run_cov.lua"
-	ls -lh luacov.stats.out
-	$(LUAROCKS_ENV) && luacov -t LcovReporter
+	@bash -c 'eval "$$(luarocks --lua-version=5.1 path)" && \
+	  nvim --headless -u tests/minimal_init.lua -c "luafile tests/run_cov.lua" && \
+	  luacov -t LcovReporter'
+	@ls -lh luacov.stats.out
 	@echo "Generated coverage report: lcov.info"
 
 clean:
@@ -23,10 +26,8 @@ clean:
 	@echo "Cleaned coverage artifacts"
 
 install-deps:
-	luarocks --lua-version=5.1 install luacov --local || true
-	luarocks --lua-version=5.1 install luacov-reporter-lcov --local || true
-	luarocks --lua-version=5.1 install luacheck --local || true
-	if [ ! -d ~/.local/share/nvim/lazy ]; then; \
-		mkdir -p ~/.local/share/nvim/lazy; \
-	fi \
-	git clone https://github.com/nvim-lua/plenary.nvim ~/.local/share/nvim/lazy/plenary.nvim || true
+	luarocks --lua-version=5.1 install --local luacov
+	luarocks --lua-version=5.1 install --local luacov-reporter-lcov
+	luarocks --lua-version=5.1 install --local luacheck	
+	git clone https://github.com/nvim-lua/plenary.nvim tests/plenary.nvim || true
+
