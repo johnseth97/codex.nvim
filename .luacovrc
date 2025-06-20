@@ -1,0 +1,6 @@
+[general]
+statsfile = "luacov.stats.out"
+reportfile = "luacov.report.out"
+
+[lcovreport]
+output = "lcov.info"
