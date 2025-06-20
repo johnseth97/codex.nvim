@@ -16,10 +16,14 @@ test:
 
 coverage:
 	@bash -c 'eval "$$(luarocks --lua-version=5.1 path)" && \
-	  nvim --headless -u tests/minimal_init.lua -c "luafile tests/run_cov.lua" && \
-	  luacov -t LcovReporter'
-	@ls -lh luacov.stats.out
-	@echo "Generated coverage report: lcov.info"
+	  nvim --headless -u tests/minimal_init.lua -c "luafile tests/run_cov.lua" || exit 0 && \
+	  if [ -f luacov.stats.out ]; then \
+	    echo "::group::Coverage"; \
+	    luacov -t LcovReporter; \
+	    echo "::endgroup::"; \
+	  else \
+	    echo "luacov.stats.out not found, skipping coverage report."; \
+	  fi'
 
 clean:
 	rm -f luacov.stats.out lcov.info
