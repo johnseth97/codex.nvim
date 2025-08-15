@@ -12,6 +12,8 @@ local config = {
   cmd = 'codex',
   model = nil, -- Default to the latest model
   autoinstall = true,
+  panel     = false,   -- if true, open Codex in a side-panel instead of floating window
+  use_buffer = false,  -- if true, capture Codex stdout into a normal buffer instead of a terminal
 }
 
 function M.setup(user_config)
@@ -83,6 +85,18 @@ local function open_window()
   })
 end
 
+--- Open Codex in a side-panel (vertical split) instead of floating window
+local function open_panel()
+  -- Create a vertical split on the right and show the buffer
+  vim.cmd('vertical rightbelow vsplit')
+  local win = vim.api.nvim_get_current_win()
+  vim.api.nvim_win_set_buf(win, state.buf)
+  -- Adjust width according to config (percentage of total columns)
+  local width = math.floor(vim.o.columns * config.width)
+  vim.api.nvim_win_set_width(win, width)
+  state.win = win
+end
+
 function M.open()
   local function create_clean_buf()
     local buf = vim.api.nvim_create_buf(false, false)
@@ -117,7 +131,7 @@ function M.open()
             'You can install manually with:',
             '  npm install -g @openai/codex',
           })
-          open_window()
+          if config.panel then open_panel() else open_window() end
         end
       end)
       return
@@ -134,7 +148,7 @@ function M.open()
         '',
         'Or enable autoinstall in setup: require("codex").setup{ autoinstall = true }',
       })
-      open_window()
+      if config.panel then open_panel() else open_window() end
       return
     end
   end
@@ -147,21 +161,53 @@ function M.open()
     state.buf = create_clean_buf()
   end
 
-  open_window()
+  if config.panel then open_panel() else open_window() end
 
   if not state.job then
+    -- assemble command
     local cmd_args = type(config.cmd) == 'string' and { config.cmd } or vim.deepcopy(config.cmd)
     if config.model then
       table.insert(cmd_args, '-m')
       table.insert(cmd_args, config.model)
     end
 
-    state.job = vim.fn.termopen(cmd_args, {
-      cwd = vim.loop.cwd(),
-      on_exit = function()
-        state.job = nil
-      end,
-    })
+    if config.use_buffer then
+      -- capture stdout/stderr into normal buffer
+      state.job = vim.fn.jobstart(cmd_args, {
+        cwd = vim.loop.cwd(),
+        stdout_buffered = true,
+        on_stdout = function(_, data)
+          if not data then return end
+          for _, line in ipairs(data) do
+            if line ~= '' then
+              vim.api.nvim_buf_set_lines(state.buf, -1, -1, false, { line })
+            end
+          end
+        end,
+        on_stderr = function(_, data)
+          if not data then return end
+          for _, line in ipairs(data) do
+            if line ~= '' then
+              vim.api.nvim_buf_set_lines(state.buf, -1, -1, false, { '[ERR] ' .. line })
+            end
+          end
+        end,
+        on_exit = function(_, code)
+          state.job = nil
+          vim.api.nvim_buf_set_lines(state.buf, -1, -1, false, {
+            ('[Codex exit: %d]'):format(code),
+          })
+        end,
+      })
+    else
+      -- use a terminal buffer
+      state.job = vim.fn.termopen(cmd_args, {
+        cwd = vim.loop.cwd(),
+        on_exit = function()
+          state.job = nil
+        end,
+      })
+    end
   end
 end
 
