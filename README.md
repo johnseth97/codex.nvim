@@ -1,16 +1,14 @@
 # Codex Neovim Plugin
 <img width="1480" alt="image" src="https://github.com/user-attachments/assets/eac126c5-e71c-4de9-817a-bf4e8f2f6af9" />
 
-## A Neovim plugin integrating the open-sourced Codex CLI (`codex`).
+## A Neovim plugin integrating the open-sourced Codex CLI (`codex`)
 > Latest version: ![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/johnseth97/codex.nvim?sort=semver)
-
-Note: As of v1.0.0, <Esc> no longer closes the Codex window. Press q to close, and <Esc><Esc> to safely interrupt model generation without resetting context.
 
 ### Features:
 - ✅ Toggle Codex floating window with `:CodexToggle`
 - ✅ Optional keymap mapping via `setup` call
 - ✅ Background running when window hidden
-- ✅ Statusline integration via `require('codex').status()` 
+- ✅ Statusline integration via `require('codex').status()`
 
 ### Installation:
 
@@ -42,7 +40,10 @@ return {
     },
   },
   opts = {
-    keymaps     = {},         -- Disable internal default keymap (<leader>cc -> :CodexToggle)
+    keymaps     = {
+      toggle = nil, -- Keybind to toggle Codex window (Disabled by default, watch out for conflicts)
+      quit = '<C-q>', -- Keybind to close the Codex window (default: Ctrl + q)
+    },         -- Disable internal default keymap (<leader>cc -> :CodexToggle)
     border      = 'rounded',  -- Options: 'single', 'double', or 'rounded'
     width       = 0.8,        -- Width of the floating window (0.0 to 1.0)
     height      = 0.8,        -- Height of the floating window (0.0 to 1.0)
