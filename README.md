@@ -44,11 +44,12 @@ return {
       toggle = nil, -- Keybind to toggle Codex window (Disabled by default, watch out for conflicts)
       quit = '<C-q>', -- Keybind to close the Codex window (default: Ctrl + q)
     },         -- Disable internal default keymap (<leader>cc -> :CodexToggle)
-    border      = 'rounded',  -- Options: 'single', 'double', or 'rounded'
-    width       = 0.8,        -- Width of the floating window (0.0 to 1.0)
-    height      = 0.8,        -- Height of the floating window (0.0 to 1.0)
-    model       = nil,        -- Optional: pass a string to use a specific model (e.g., 'o3-mini')
-    autoinstall = true,       -- Automatically install the Codex CLI if not found
+    border          = 'rounded', -- Options: 'single', 'double', or 'rounded'
+    width           = 0.8,       -- Width of the floating window (0.0 to 1.0)
+    height          = 0.8,       -- Height of the floating window (0.0 to 1.0)
+    model           = nil,       -- Optional: pass a string to use a specific model (e.g., 'o3-mini')
+    autoinstall     = true,      -- Automatically install the Codex CLI if not found
+    start_in_insert = false,     -- Automatically enter insert mode on open
   },
 }```
 
@@ -65,4 +66,3 @@ require('codex').status() -- drop in to your lualine sections
 - All plugin configurations can be seen in the `opts` table of the plugin setup, as shown in the installation section.
 
 - **For deeper customization, please refer to the [Codex CLI documentation](https://github.com/openai/codex?tab=readme-ov-file#full-configuration-example) full configuration example. These features change quickly as Codex CLI is in active beta development.*
-
