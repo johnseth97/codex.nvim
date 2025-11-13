@@ -37,6 +37,7 @@ return {
       '<leader>cc', -- Change this to your preferred keybinding
       function() require('codex').toggle() end,
       desc = 'Toggle Codex popup',
+      mode = { 'n', 't' }
     },
   },
   opts = {
