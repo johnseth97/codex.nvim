@@ -15,6 +15,7 @@ local config = {
   cmd = 'codex',
   model = nil, -- Default to the latest model
   autoinstall = true,
+  start_in_insert = false,
 }
 
 function M.setup(user_config)
@@ -160,6 +161,13 @@ function M.open()
 
   open_window()
 
+  if config.start_in_insert and vim.api.nvim_buf_is_valid(state.buf) then
+    local ok, buftype = pcall(vim.api.nvim_buf_get_option, state.buf, 'buftype')
+    if ok and buftype == 'terminal' then
+      vim.cmd 'startinsert!'
+    end
+  end
+
   if not state.job then
     local cmd_args = type(config.cmd) == 'string' and { config.cmd } or vim.deepcopy(config.cmd)
     if config.model then
@@ -173,6 +181,10 @@ function M.open()
         state.job = nil
       end,
     })
+
+    if config.start_in_insert then
+      vim.cmd 'startinsert!'
+    end
   end
 end
 
