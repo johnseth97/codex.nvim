@@ -5,7 +5,7 @@
 > Latest version: ![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/johnseth97/codex.nvim?sort=semver)
 
 ### Features:
-- ✅ Toggle Codex floating window with `:CodexToggle`
+- ✅ Toggle Codex window or side-panel with `:CodexToggle`
 - ✅ Optional keymap mapping via `setup` call
 - ✅ Background running when window hidden
 - ✅ Statusline integration via `require('codex').status()`
@@ -29,14 +29,14 @@ export OPENAI_API_KEY=your_api_key
 
 ```lua
 return {
-  'johnseth97/codex.nvim',
+  'kkrampis/codex.nvim',
   lazy = true,
   cmd = { 'Codex', 'CodexToggle' }, -- Optional: Load only on command execution
   keys = {
     {
       '<leader>cc', -- Change this to your preferred keybinding
       function() require('codex').toggle() end,
-      desc = 'Toggle Codex popup',
+      desc = 'Toggle Codex popup or side-panel',
       mode = { 'n', 't' }
     },
   },
@@ -50,12 +50,16 @@ return {
     height      = 0.8,        -- Height of the floating window (0.0 to 1.0)
     model       = nil,        -- Optional: pass a string to use a specific model (e.g., 'o3-mini')
     autoinstall = true,       -- Automatically install the Codex CLI if not found
+    panel       = false,      -- Open Codex in a side-panel (vertical split) instead of floating window
+    use_buffer  = false,      -- Capture Codex stdout into a normal buffer instead of a terminal buffer
   },
 }```
 
 ### Usage:
-- Call `:Codex` (or `:CodexToggle`) to open or close the Codex popup.
--- Map your own keybindings via the `keymaps.toggle` setting.
+- Call `:Codex` (or `:CodexToggle`) to open or close the Codex popup or side-panel.
+- Map your own keybindings via the `keymaps.toggle` setting.
+- To choose floating popup vs side-panel, set `panel = false` (popup) or `panel = true` (panel) in your setup options.
+- To capture Codex output in an editable buffer instead of a terminal, set `use_buffer = true` (or `false` to keep terminal) in your setup options.
 - Add the following code to show backgrounded Codex window in lualine:
 
 ```lua
@@ -66,4 +70,3 @@ require('codex').status() -- drop in to your lualine sections
 - All plugin configurations can be seen in the `opts` table of the plugin setup, as shown in the installation section.
 
 - **For deeper customization, please refer to the [Codex CLI documentation](https://github.com/openai/codex?tab=readme-ov-file#full-configuration-example) full configuration example. These features change quickly as Codex CLI is in active beta development.*
-
