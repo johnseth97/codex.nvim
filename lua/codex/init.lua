@@ -5,7 +5,10 @@ local state = require 'codex.state'
 local M = {}
 
 local config = {
-  keymaps = {},
+  keymaps = {
+    toggle = nil,
+    quit = '<C-q>', -- Default: Ctrl+q to quit
+  },
   border = 'single',
   width = 0.8,
   height = 0.8,
@@ -100,11 +103,19 @@ end
 function M.open()
   local function create_clean_buf()
     local buf = vim.api.nvim_create_buf(false, false)
+
     vim.api.nvim_buf_set_option(buf, 'bufhidden', 'hide')
     vim.api.nvim_buf_set_option(buf, 'swapfile', false)
     vim.api.nvim_buf_set_option(buf, 'filetype', 'codex')
-    vim.api.nvim_buf_set_keymap(buf, 't', 'q', [[<C-\><C-n><cmd>lua require('codex').close()<CR>]], { noremap = true, silent = true })
-    vim.api.nvim_buf_set_keymap(buf, 'n', 'q', [[<cmd>lua require('codex').close()<CR>]], { noremap = true, silent = true })
+
+    -- Apply configured quit keybinding
+
+    if config.keymaps.quit then
+      local quit_cmd = [[<cmd>lua require('codex').close()<CR>]]
+      vim.api.nvim_buf_set_keymap(buf, 't', config.keymaps.quit, [[<C-\><C-n>]] .. quit_cmd, { noremap = true, silent = true })
+      vim.api.nvim_buf_set_keymap(buf, 'n', config.keymaps.quit, quit_cmd, { noremap = true, silent = true })
+    end
+
     return buf
   end
 
